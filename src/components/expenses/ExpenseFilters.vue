@@ -11,11 +11,16 @@
         :clearable="true"
         :value="selectedOption"
         :append-to-body="false"
-        :aria-label-combobox="'Benutzer filtern'"
+        input-label="Benutzer filtern"
+        placeholder="Nach Benutzer filtern"
         @input="onUserChange" />
     </div>
-    <NcTextField v-model="local.from" type="date" label="Von" @input="emit" />
-    <NcTextField v-model="local.to" type="date" label="Bis" @input="emit" />
+    <div class="from-filter">
+      <NcTextField v-model="local.from" type="date" label="Von" @input="emit" />
+    </div>
+    <div class="to-filter">
+      <NcTextField v-model="local.to" type="date" label="Bis" @input="emit" />
+    </div>
     <NcButton variant="tertiary" @click="reset" aria-label="Filter zurücksetzen">Zurücksetzen</NcButton>
   </div>
 </template>
@@ -77,6 +82,10 @@ export default {
 .filters .user-filter .multiselect { width: 100% !important; min-width: 0 !important; }
 .filters .user-filter .multiselect__tags { width: 100%; overflow: hidden; }
 .filters .user-filter .multiselect__single { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.filters .from-filter,
+.filters .to-filter { width: 100%; }
+.filters .from-filter input,
+.filters .to-filter input { width: 100%; }
 @media (max-width: 860px) {
   .filters { grid-template-columns: 1fr 1fr; }
 }
