@@ -59,7 +59,6 @@ export default {
   },
 }
 </script>
-
 <style>
 .filters {
   display: grid;
@@ -78,8 +77,10 @@ export default {
 .filters .user-filter .multiselect { width: 100% !important; min-width: 0 !important; }
 .filters .user-filter .multiselect__tags { width: 100%; overflow: hidden; }
 .filters .user-filter .multiselect__single { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-
 @media (max-width: 860px) {
   .filters { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .filters { grid-template-columns: 1fr; }
 }
 </style>

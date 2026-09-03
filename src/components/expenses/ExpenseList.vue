@@ -4,7 +4,7 @@
       <div class="month-header" @click="toggle(m.key)" :aria-expanded="isOpen(m.key)" role="button" tabindex="0" @keydown.enter.prevent="toggle(m.key)" @keydown.space.prevent="toggle(m.key)">
         <h3 class="month-title">{{ m.label }}</h3>
         <div class="summary">
-          <span class="total">Gesamt: <strong>{{ centsToEuro(m.total) }} €</strong></span>
+          <span class="total">Monat: <strong>{{ centsToEuro(m.total) }} €</strong></span>
           <span
             v-for="u in m.perUser"
             :key="u.user"
@@ -15,11 +15,24 @@
           </span>
           <span
             v-for="s in m.settlements"
-            :key="s.from + '-' + s.to"
+            :key="'m-' + s.from + '-' + s.to"
             class="settle"
             :class="settleClass(s)"
             :title="settlementTitle(s)">
             <span class="names">{{ s.from }} → {{ s.to }}</span>
+            <span class="sep">—</span>
+            <span class="amt">{{ centsToEuro(s.amount) }} €</span>
+          </span>
+        </div>
+        <div class="summary summary-running">
+          <span class="running">Gesamt: <strong>{{ centsToEuro(m.runningTotal) }} €</strong></span>
+          <span
+            v-for="s in m.runningSettlements"
+            :key="'r-' + s.from + '-' + s.to"
+            class="settle running-settle"
+            :class="settleClass(s)"
+            :title="'Gesamt: ' + settlementTitle(s)">
+            <span class="names">Gesamt: {{ s.from }} → {{ s.to }}</span>
             <span class="sep">—</span>
             <span class="amt">{{ centsToEuro(s.amount) }} €</span>
           </span>
@@ -90,6 +103,20 @@ export default {
         const settlements = this.computeSettlements(perUser, total)
         res.push({ key: ym, label: this.formatMonthYear(ym), items, total, perUser, settlements })
       }
+
+      // laufende Gesamtsumme + laufende Aufteilung (kumuliert über alle Monate bis einschließlich diesem)
+      const runningPerUserMap = new Map()
+      let running = 0
+      for (let i = res.length - 1; i >= 0; i--) {
+        running += res[i].total
+        res[i].runningTotal = running
+        for (const { user, total: t } of res[i].perUser) {
+          runningPerUserMap.set(user, (runningPerUserMap.get(user) || 0) + t)
+        }
+        const runningPerUser = Array.from(runningPerUserMap.entries()).map(([user, total]) => ({ user, total }))
+        res[i].runningSettlements = this.computeSettlements(runningPerUser, running)
+      }
+
       return res
     },
   },
@@ -164,7 +191,9 @@ export default {
 .expense-months .month-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--color-primary); border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
 .expense-months .month-title { margin: 0; }
 .expense-months .summary { display: flex; gap: 12px; flex-wrap: wrap; color: var(--color-text-lighter); align-items: center; }
+.expense-months .summary-running { margin-top: 4px; }
 .expense-months .summary .total { font-weight: 700; color: var(--color-main-text); font-size: 1.1rem; }
+.expense-months .summary .running { font-weight: 700; color: var(--color-main-text); font-size: 1.1rem; }
 .expense-months .summary .per-user { font-size: 12px; opacity: 0.9; }
 .expense-months .summary .per-user.me { font-weight: 700; color: var(--color-main-text); text-decoration: underline; text-decoration-color: var(--color-primary-element); text-underline-offset: 3px; }
 .expense-months .summary .settle { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 9999px; background: var(--color-background-dark); color: var(--color-main-text); border: 1px solid var(--color-border); }
@@ -182,6 +211,14 @@ export default {
 .expense-months .amount { display: flex; align-items: center; justify-content: flex-end; gap: 6px; text-align: right; font-variant-numeric: tabular-nums; flex-wrap: nowrap; }
 .expense-months .amount-badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; background: var(--color-primary-element-light); color: var(--color-main-text); white-space: nowrap; }
 .expense-months .amount .icon-btn .button-vue { padding: 4px; }
+@media (max-width: 480px) {
+  .expense-months .expense-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .expense-months .amount { justify-content: flex-start; }
+  .expense-months .summary { gap: 6px; }
+}
 .expense-row .desc .name { font-weight: 500; }
 .expense-row .desc .by { color: var(--color-text-lighter); font-size: 12px; }
 .amount { text-align: right; font-variant-numeric: tabular-nums; }
