@@ -1,27 +1,44 @@
 <template>
   <div class="filters">
-    <div class="search-filter">
-      <NcTextField v-model="local.query" label="Suche" placeholder="Beschreibung durchsuchen" @input="emit" />
+    <div class="filter-item search-filter">
+      <NcTextField
+        v-model="local.query"
+        label="Suche"
+        placeholder="Beschreibung durchsuchen"
+        @input="emit" />
     </div>
-    <div class="user-filter">
+    <div class="filter-item user-filter">
       <NcSelect
-        class="user-select"
+        v-model="local.user"
         :options="userOptions"
-        label="label"
-        :clearable="true"
-        :value="selectedOption"
-        :append-to-body="false"
         input-label="Benutzer filtern"
         placeholder="Nach Benutzer filtern"
+        :clearable="true"
+        :append-to-body="true"
         @input="onUserChange" />
     </div>
-    <div class="from-filter">
-      <NcTextField v-model="local.from" type="date" label="Von" @input="emit" />
+    <div class="filter-item date-filter">
+      <NcTextField
+        v-model="local.from"
+        type="date"
+        label="Von"
+        @input="emit" />
     </div>
-    <div class="to-filter">
-      <NcTextField v-model="local.to" type="date" label="Bis" @input="emit" />
+    <div class="filter-item date-filter">
+      <NcTextField
+        v-model="local.to"
+        type="date"
+        label="Bis"
+        @input="emit" />
     </div>
-    <NcButton variant="tertiary" @click="reset" aria-label="Filter zurücksetzen">Zurücksetzen</NcButton>
+    <div class="filter-item button-filter">
+      <NcButton
+        variant="tertiary"
+        @click="reset"
+        aria-label="Filter zurücksetzen">
+        Zurücksetzen
+      </NcButton>
+    </div>
   </div>
 </template>
 
@@ -38,58 +55,120 @@ export default {
     expenses: { type: Array, default: () => [] },
   },
   data() {
-    return { local: { query: '', user: null, from: '', to: '' } }
+    return {
+      local: { query: '', user: null, from: '', to: '' },
+    }
   },
   computed: {
     userOptions() {
       const set = new Set(this.expenses.map(e => e.user_uid).filter(Boolean))
-      return Array.from(set).sort().map(u => ({ id: u, label: u }))
-    },
-    selectedOption() {
-      const uid = this.local.user || null
-      return uid ? { id: uid, label: uid } : null
+      return Array.from(set).sort()
     },
   },
   watch: {
     value: {
       deep: true,
       immediate: true,
-      handler(v) { this.local = { ...{ query: '', user: null, from: '', to: '' }, ...(v || {}) } },
+      handler(v) {
+        this.local = { query: '', user: null, from: '', to: '', ...(v || {}) }
+      },
     },
   },
   methods: {
-    onUserChange(val) { this.local.user = val ? (val.id || val.value || val) : null; this.emit() },
-    emit() { this.$emit('input', { ...this.local }) },
-    reset() { this.local = { query: '', user: null, from: '', to: '' }; this.emit() },
+    onUserChange(val) {
+      this.local.user = val || null
+      this.emit()
+    },
+    emit() {
+      this.$emit('input', { ...this.local })
+    },
+    reset() {
+      this.local = { query: '', user: null, from: '', to: '' }
+      this.emit()
+    },
   },
 }
 </script>
-<style>
+
+<style scoped>
 .filters {
   display: grid;
-  grid-template-columns: 240px 220px 140px 140px 120px;
-  gap: 2px;
-  align-items: end;
-  max-width: 900px;
-  margin: 8px auto 12px;
-  padding: 0 8px;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: end; /* Zwingt alle Elemente, unten sauber abzuschließen */
+  max-width: 100%;
+  margin: 16px 0;
+  padding: 0;
+  position: relative;
+  z-index: 50;
 }
-.filters > * { min-width: 0; }
-.filters .search-filter { max-width: 240px; width: 100%; }
-.filters .search-filter input { width: 100%; }
-/* Ensure the select respects its grid cell and does not overflow */
-.filters .user-filter { width: 100%; overflow: hidden; }
-.filters .user-filter .multiselect { width: 100% !important; min-width: 0 !important; }
-.filters .user-filter .multiselect__tags { width: 100%; overflow: hidden; }
-.filters .user-filter .multiselect__single { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.filters .from-filter,
-.filters .to-filter { width: 100%; }
-.filters .from-filter input,
-.filters .to-filter input { width: 100%; }
-@media (max-width: 860px) {
-  .filters { grid-template-columns: 1fr 1fr; }
+
+.filter-item {
+  min-width: 0; /* Verhindert das Sprengen des Grids durch Flex/Inputs */
 }
-@media (max-width: 480px) {
-  .filters { grid-template-columns: 1fr; }
+
+.button-filter {
+  display: flex;
+  align-items: center;
+  padding-bottom: 2px; /* Zieht den Button perfekt auf Input-Höhe */
+}
+
+/* Exakte Anpassung des NcSelect an Nextcloud Standard-Inputs */
+.user-filter :deep(.multiselect) {
+  min-height: 44px;
+}
+
+.user-filter :deep(.multiselect__tags) {
+  min-height: 44px;
+  max-height: 44px;
+  border-radius: var(--border-radius, 8px);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-main-background);
+  display: flex;
+  align-items: center;
+  padding: 0 40px 0 12px;
+}
+
+.user-filter :deep(.multiselect__single),
+.user-filter :deep(.multiselect__input) {
+  background: transparent !important;
+  margin-bottom: 0 !important;
+  line-height: normal;
+  padding-top: 0 !important;
+}
+
+.user-filter :deep(.multiselect__select) {
+  height: 44px;
+}
+
+/* Einheitliches Label-Styling erzwingen, damit das Suchfeld nicht verrutscht */
+:deep(.input-field__label),
+.user-filter :deep(.multiselect__label),
+.user-filter :deep(label) {
+  display: block;
+  height: 20px; /* Feste Texthöhe oben für alle Labels reservieren */
+  margin-bottom: 4px;
+  font-size: var(--font-size-small, 13px);
+  color: var(--color-text-maxcontrast);
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+  .button-filter {
+    grid-column: span 2;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+  .button-filter {
+    grid-column: span 1;
+  }
 }
 </style>
