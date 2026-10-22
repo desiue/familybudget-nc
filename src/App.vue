@@ -209,6 +209,8 @@ export default {
 
 <style>
  .content-header { display:flex; align-items:center; justify-content: space-between; gap: 12px; margin: 6px auto 12px; max-width: 900px; padding: 0 8px; }
+ /* Platz für den Menü-Knopf (☰) links oben: nur so viel, wie der seitliche Rand nicht schon hergibt */
+ .content-header { padding-left: max(8px, min(var(--fb-toggle-space), calc(var(--fb-toggle-space) - (100% - 916px) / 2))); --fb-toggle-space: calc(var(--default-clickable-area, 34px) + 22px); }
  .content-header .title { margin: 0; }
  .content-header .actions { display: flex; gap: 8px; margin-top: 6px; }
 .add-book { display: flex; gap: 8px; margin-top: 8px; }

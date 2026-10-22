@@ -18,18 +18,26 @@
         @input="onUserChange" />
     </div>
     <div class="filter-item date-filter">
-      <NcTextField
-        v-model="local.from"
-        type="date"
-        label="Von"
-        @input="emit" />
+      <label class="fb-date">
+        <span class="fb-date__label">Von</span>
+        <input
+          class="fb-date__input"
+          type="date"
+          :value="local.from"
+          @input="onDate('from', $event)"
+          @change="onDate('from', $event)">
+      </label>
     </div>
     <div class="filter-item date-filter">
-      <NcTextField
-        v-model="local.to"
-        type="date"
-        label="Bis"
-        @input="emit" />
+      <label class="fb-date">
+        <span class="fb-date__label">Bis</span>
+        <input
+          class="fb-date__input"
+          type="date"
+          :value="local.to"
+          @input="onDate('to', $event)"
+          @change="onDate('to', $event)">
+      </label>
     </div>
     <div class="filter-item button-filter">
       <NcButton
@@ -75,6 +83,12 @@ export default {
     },
   },
   methods: {
+    onDate(key, ev) {
+      // iOS Safari meldet Datumsauswahl teils nur per change-Event
+      if (this.local[key] === ev.target.value) return
+      this.local[key] = ev.target.value
+      this.emit()
+    },
     onUserChange(val) {
       this.local.user = val || null
       this.emit()
@@ -134,27 +148,55 @@ export default {
   box-shadow: 0 0 0 2px var(--color-border-maxcontrast);
 }
 
-/* iOS Safari: Datumsfelder haben eine eigene Mindestbreite (ignorieren width:100%)
-   und ein leeres Feld klappt auf Höhe 0 zusammen */
-.date-filter { overflow-x: clip; } /* Sicherheitsnetz: nichts kann die Seite seitlich verschieben */
-.date-filter :deep(.input-field),
-.date-filter :deep(.input-field__main-wrapper) {
-  min-width: 0;
-  max-width: 100%;
-}
-.date-filter :deep(input[type="date"]) {
-  min-height: var(--default-clickable-area, 34px);
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
+/* Datumsfelder: Rahmen und Label hängen an einem normalen Container (.fb-date),
+   das native Datumsfeld liegt unsichtbar darüber und füllt ihn aus.
+   Grund: iOS Safari zeichnet input[type=date] eigenwillig (kein Rahmen, Überbreite). */
+.fb-date {
+  position: relative;
   display: block;
+  height: var(--default-clickable-area, 34px);
+  border-radius: var(--border-radius-element, 8px);
+  box-shadow: 0 -1px var(--color-border-maxcontrast), 0 0 0 1px color-mix(in srgb, var(--color-border-maxcontrast), 65% transparent);
+  background: var(--color-main-background);
+  cursor: pointer;
+}
+.fb-date:hover,
+.fb-date:focus-within {
+  box-shadow: 0 0 0 2px var(--color-border-maxcontrast);
+}
+.fb-date__label {
+  position: absolute;
+  top: -0.7em;
+  left: 10px;
+  z-index: 1;
+  padding: 0 4px;
+  font-size: var(--font-size-small, 13px);
+  line-height: 1.2;
+  color: var(--color-text-maxcontrast);
+  background: var(--color-main-background);
+  pointer-events: none;
+}
+.fb-date__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 12px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-main-text);
+  font: inherit;
+  line-height: var(--default-clickable-area, 34px);
   -webkit-appearance: none;
   appearance: none;
-  text-align: start;
+  color-scheme: inherit;
 }
-.date-filter :deep(input[type="date"]::-webkit-date-and-time-value) {
+.fb-date__input::-webkit-date-and-time-value {
   text-align: start;
-  min-height: 1.2em;
 }
 
 /* Handy: alles untereinander, volle Breite */
