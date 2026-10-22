@@ -116,6 +116,22 @@ export default {
 .user-filter :deep(.select) {
   min-width: 0 !important;
   width: 100%;
+  margin: 0 0 1px 0 !important; /* gleiche Unterkante wie die Textfelder */
+}
+
+/* Benutzerfeld (NcSelect, alter Rahmenstil) optisch an die Textfelder (neuer Stil) angleichen:
+   kein echter Rahmen, sondern Linie oben + blasser Ring, gleiche Rundung und Höhe */
+.user-filter :deep(.vs__dropdown-toggle) {
+  border: none !important;
+  border-radius: var(--border-radius-element, 8px) !important;
+  box-shadow: 0 -1px var(--color-border-maxcontrast), 0 0 0 1px color-mix(in srgb, var(--color-border-maxcontrast), 65% transparent);
+  min-height: var(--default-clickable-area, 34px);
+  padding-bottom: 0;
+}
+.user-filter :deep(.v-select:hover .vs__dropdown-toggle),
+.user-filter :deep(.v-select:focus-within .vs__dropdown-toggle),
+.user-filter :deep(.vs--open .vs__dropdown-toggle) {
+  box-shadow: 0 0 0 2px var(--color-border-maxcontrast);
 }
 
 /* iOS Safari: leeres Datumsfeld klappt sonst auf Höhe 0 zusammen */
