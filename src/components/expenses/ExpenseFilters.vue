@@ -11,8 +11,8 @@
       <NcSelect
         v-model="local.user"
         :options="userOptions"
-        input-label="Benutzer filtern"
-        placeholder="Nach Benutzer filtern"
+        :aria-label-combobox="'Benutzer filtern'"
+        placeholder="Benutzer"
         :clearable="true"
         :append-to-body="true"
         @input="onUserChange" />
@@ -91,84 +91,46 @@ export default {
 </script>
 
 <style scoped>
+/* Filterleiste: gleiche Breite wie Titel und Liste (max. 900px, zentriert), bricht von selbst um */
 .filters {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr 1fr auto;
-  gap: 16px;
-  align-items: end; /* Zwingt alle Elemente, unten sauber abzuschließen */
-  max-width: 100%;
-  margin: 16px 0;
-  padding: 0;
-  position: relative;
-  z-index: 50;
-}
-
-.filter-item {
-  min-width: 0; /* Verhindert das Sprengen des Grids durch Flex/Inputs */
-}
-
-.button-filter {
   display: flex;
-  align-items: center;
-  padding-bottom: 2px; /* Zieht den Button perfekt auf Input-Höhe */
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  max-width: 900px;
+  margin: 8px auto 12px;
+  padding: 0 8px;
 }
 
-/* Exakte Anpassung des NcSelect an Nextcloud Standard-Inputs */
-.user-filter :deep(.multiselect) {
-  min-height: 44px;
+.filter-item { min-width: 0; box-sizing: border-box; }
+.search-filter { flex: 2 1 220px; }
+.user-filter { flex: 1.5 1 180px; }
+.date-filter { flex: 1 1 140px; }
+.button-filter { flex: 0 0 auto; display: flex; align-items: center; }
+
+/* Eingabefelder: Innenabstand in die Breite einrechnen, sonst ragen sie über den Rand (iPhone: Seite seitlich verschiebbar) */
+.filters :deep(input) { box-sizing: border-box; max-width: 100%; }
+
+/* NcSelect bringt eine eigene Mindestbreite mit, die die Spalte sprengt */
+.user-filter :deep(.v-select),
+.user-filter :deep(.select) {
+  min-width: 0 !important;
+  width: 100%;
 }
 
-.user-filter :deep(.multiselect__tags) {
-  min-height: 44px;
-  max-height: 44px;
-  border-radius: var(--border-radius, 8px);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-main-background);
-  display: flex;
-  align-items: center;
-  padding: 0 40px 0 12px;
-}
-
-.user-filter :deep(.multiselect__single),
-.user-filter :deep(.multiselect__input) {
-  background: transparent !important;
-  margin-bottom: 0 !important;
-  line-height: normal;
-  padding-top: 0 !important;
-}
-
-.user-filter :deep(.multiselect__select) {
-  height: 44px;
-}
-
-/* Einheitliches Label-Styling erzwingen, damit das Suchfeld nicht verrutscht */
-:deep(.input-field__label),
-.user-filter :deep(.multiselect__label),
-.user-filter :deep(label) {
+/* iOS Safari: leeres Datumsfeld klappt sonst auf Höhe 0 zusammen */
+.date-filter :deep(input[type="date"]) {
+  min-height: var(--default-clickable-area, 34px);
+  width: 100%;
   display: block;
-  height: 20px; /* Feste Texthöhe oben für alle Labels reservieren */
-  margin-bottom: 4px;
-  font-size: var(--font-size-small, 13px);
-  color: var(--color-text-maxcontrast);
-  white-space: nowrap;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-@media (max-width: 1024px) {
-  .filters {
-    grid-template-columns: 1fr 1fr;
-  }
-  .button-filter {
-    grid-column: span 2;
-    justify-content: flex-start;
-  }
-}
-
+/* Handy: alles untereinander, volle Breite */
 @media (max-width: 600px) {
-  .filters {
-    grid-template-columns: 1fr;
-  }
-  .button-filter {
-    grid-column: span 1;
-  }
+  .search-filter,
+  .user-filter,
+  .date-filter { flex: 1 1 100%; }
 }
 </style>

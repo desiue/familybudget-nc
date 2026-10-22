@@ -187,11 +187,14 @@ export default {
 
 <style>
 .expense-months { display: grid; gap: 16px; max-width: 900px; margin: 0 auto; padding: 0 8px; }
-.expense-months .month-header { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-background-darker); position: relative; cursor: pointer; }
+.expense-months .month-header { display: grid; grid-template-columns: auto 1fr auto; column-gap: 16px; row-gap: 4px; align-items: center; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-background-darker); position: relative; cursor: pointer; }
 .expense-months .month-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--color-primary); border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
 .expense-months .month-title { margin: 0; }
 .expense-months .summary { display: flex; gap: 12px; flex-wrap: wrap; color: var(--color-text-lighter); align-items: center; }
-.expense-months .summary-running { margin-top: 4px; }
+.expense-months .month-title { grid-column: 1; grid-row: 1; }
+.expense-months .month-header > .summary { grid-column: 2; grid-row: 1; min-width: 0; }
+.expense-months .month-header > .summary-running { grid-column: 2; grid-row: 2; }
+.expense-months .month-header > .chev { grid-column: 3; grid-row: 1 / span 2; }
 .expense-months .summary .total { font-weight: 700; color: var(--color-main-text); font-size: 1.1rem; }
 .expense-months .summary .running { font-weight: 700; color: var(--color-main-text); font-size: 1.1rem; }
 .expense-months .summary .per-user { font-size: 12px; opacity: 0.9; }
@@ -200,7 +203,7 @@ export default {
 .expense-months .summary .settle .amt { font-weight: 700; letter-spacing: .1px; }
 .expense-months .summary .settle.creditor { border-color: var(--color-success); color: var(--color-success-text); background: var(--color-background-dark); }
 .expense-months .summary .settle.debtor { border-color: var(--color-error); color: var(--color-error-text); background: var(--color-background-dark); }
-.expense-months .chev { margin-left: auto; display: flex; align-items: center; }
+.expense-months .chev { display: flex; align-items: center; }
 .expense-months .expense-list { list-style: none; padding: 0; margin: 8px 0 0; width: 100%; }
 .expense-months .expense-list.cards { display: grid; gap: 8px; }
 .expense-months .expense-row { display: grid; grid-template-columns: 110px 1fr 220px; gap: 12px; padding: 12px 16px; align-items: center; }
@@ -218,6 +221,12 @@ export default {
   }
   .expense-months .amount { justify-content: flex-start; }
   .expense-months .summary { gap: 6px; }
+}
+@media (max-width: 600px) {
+  .expense-months .month-header { grid-template-columns: 1fr auto; }
+  .expense-months .month-header > .summary { grid-column: 1 / -1; grid-row: 2; }
+  .expense-months .month-header > .summary-running { grid-column: 1 / -1; grid-row: 3; }
+  .expense-months .month-header > .chev { grid-column: 2; grid-row: 1; }
 }
 .expense-row .desc .name { font-weight: 500; }
 .expense-row .desc .by { color: var(--color-text-lighter); font-size: 12px; }
