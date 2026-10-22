@@ -134,13 +134,27 @@ export default {
   box-shadow: 0 0 0 2px var(--color-border-maxcontrast);
 }
 
-/* iOS Safari: leeres Datumsfeld klappt sonst auf Höhe 0 zusammen */
+/* iOS Safari: Datumsfelder haben eine eigene Mindestbreite (ignorieren width:100%)
+   und ein leeres Feld klappt auf Höhe 0 zusammen */
+.date-filter { overflow-x: clip; } /* Sicherheitsnetz: nichts kann die Seite seitlich verschieben */
+.date-filter :deep(.input-field),
+.date-filter :deep(.input-field__main-wrapper) {
+  min-width: 0;
+  max-width: 100%;
+}
 .date-filter :deep(input[type="date"]) {
   min-height: var(--default-clickable-area, 34px);
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   display: block;
   -webkit-appearance: none;
   appearance: none;
+  text-align: start;
+}
+.date-filter :deep(input[type="date"]::-webkit-date-and-time-value) {
+  text-align: start;
+  min-height: 1.2em;
 }
 
 /* Handy: alles untereinander, volle Breite */
