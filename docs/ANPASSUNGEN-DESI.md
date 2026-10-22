@@ -33,7 +33,7 @@ als die installierte sein; beim ersten Einspielen ist einmal `php occ upgrade` n
 | Benutzerfeld anders als Suchfeld (0.4.5.3) | NcSelect nutzt noch 2-px-Rahmen, Textfelder den neuen Stil (Linie oben + blasser Ring), 4 px Außenabstand unten | Rahmen per Schatten wie Textfeld, gleiche Rundung/Höhe/Unterkante |
 | „Gesamt“ in derselben Zeile wie „Monat“ | Monatskopf war Flex-Zeile ohne Umbruch | Raster: „Gesamt“ immer eigene Zeile |
 
-Gemessen im Testaufbau (Chromium, 1280 px und 390 px): Filterleiste bündig mit Liste (182–1098 px), keine Überbreite.
+Gemessen im Testaufbau (Chromium, 1280 px und 390 px): Filterleiste bündig mit Liste (182–1098 px), keine Überbreite, alle Felder 34 px hoch. 0.4.5.5 am 22.10.2026 auf dem iPhone (Safari) bestätigt: Titel vollständig, Datumsfelder mit Rahmen, Filter nach Benutzer und Datum funktioniert.
 
 ## Nachweis
 
@@ -44,5 +44,5 @@ Gemessen im Testaufbau (Chromium, 1280 px und 390 px): Filterleiste bündig mit 
 
 Ein Update aus dem App-Store ersetzt den kompletten App-Ordner – die Anpassungen sind dann weg.
 1. Upstream-Änderungen in diesen Fork mergen (`git fetch upstream && git merge upstream/main`).
-2. `npm ci && npm run build`, Version auf `<upstream>.1` setzen, Release-Archiv bauen.
-3. Archiv nach `apps/familybudget` auf dem Server entpacken, `php occ app:list | grep familybudget` prüfen.
+2. `npm ci && npm run build`, Version auf `<upstream>.1` setzen – sie muss **höher** sein als die installierte (sonst Upgrade-Sperre), Release-Archiv bauen (ohne `appinfo/signature.json`).
+3. Alten Ordner sichern, Archiv nach `apps/` entpacken, `php occ upgrade`, danach `bash ~/nc-apps-check.sh` (vorher SOLL-Prüfsummen im Skript aktualisieren).
